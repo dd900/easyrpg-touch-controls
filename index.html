@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EasyRPG Player</title>
+  <style>
+    :root {
+      --color-gray: hsl(0, 0%, 55%);
+      
+      --controls-size: 10vh;
+      --action-size: calc(var(--controls-size) * 0.82);
+      --shortcut-size: calc(var(--controls-size) * 0.43);
+      --numpad-size: clamp(1.6rem, calc(var(--controls-size) * 0.43), 2.5rem);
+      --controls-inset: 1rem;
+      --control-gap: max(0.25rem, calc(var(--controls-size) * 0.07));
+      --small-gap: max(0.18rem, calc(var(--controls-size) * 0.05));
+      --utility-dpad-gap: 1.6rem;
+      --numpad-action-gap: 1.5rem;
+    }
+
+    @media (orientation: landscape) {
+      :root {
+        --controls-size: 20vh;
+        --action-size: calc(var(--controls-size) * 0.82);
+        --shortcut-size: calc(var(--controls-size) * 0.43);
+        --numpad-size: clamp(1.6rem, calc(var(--controls-size) * 0.43), 2.5rem);
+        --controls-inset: 1rem;
+        --control-gap: max(0.25rem, calc(var(--controls-size) * 0.07));
+        --small-gap: max(0.18rem, calc(var(--controls-size) * 0.05));
+        --utility-dpad-gap: 1.6rem;
+        --numpad-action-gap: 1.5rem;
+      }
+    }
+
+    html {
+      touch-action: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+      margin: 0;
+      color: white;
+      background: black;
+    }
+
+    .unselectable,
+    #controls,
+    #dpad,
+    #apad,
+    #shortcut-pad,
+    #numpad-wrap,
+    #viewport {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #status {
+      font-size: 1.5rem;
+      color: var(--color-gray);
+      text-align: center;
+    }
+
+    #controls {
+      position: fixed;
+      top: 0.5rem;
+      left: 0.5rem;
+      text-align: left;
+      z-index: 30;
+    }
+
+    #controls button {
+      -webkit-appearance: button;
+      display: inline-flex;
+      background: transparent;
+      border: 0;
+      color: white;
+      font-family: inherit;
+      font-size: 1em;
+      line-height: inherit;
+      cursor: pointer;
+      padding: 0.25rem;
+      touch-action: none;
+    }
+
+    #controls svg {
+      pointer-events: none;
+    }
+
+    #canvas {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      transform: translate(-50%, -50%);
+    }
+
+    img#canvas {
+      object-fit: contain;
+    }
+    
+    #dpad,
+    #apad,
+    #shortcut-pad,
+    #numpad-wrap {
+      position: fixed;
+      z-index: 20;
+      touch-action: none;
+    }
+    
+    #dpad {
+      left: var(--controls-inset);
+      bottom: var(--controls-inset);
+      width: calc(2 * var(--controls-size));
+      height: calc(2 * var(--controls-size));
+      border-radius: 50%;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    #dpad .joystick-base {
+      position: absolute;
+      inset: 0;
+      box-sizing: border-box;
+      border: 2px solid rgba(255, 255, 255, 0.22);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 28%, rgba(255,255,255,0.16), rgba(128,128,128,0.24) 46%, rgba(0,0,0,0.48) 100%);
+      box-shadow: inset 0 3px 10px rgba(0,0,0,0.5), 0 3px 10px rgba(0,0,0,0.28);
+      pointer-events: none;
+    }
+
+    #dpad .joystick-base::before {
+      content: "";
+      position: absolute;
+      inset: 12%;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 50%;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.18);
+    }
+
+    #joystick-knob {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 46%;
+      height: 46%;
+      box-sizing: border-box;
+      border: 2px solid rgba(255,255,255,0.28);
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 24%, hsl(0,0%,76%), hsl(0,0%,49%) 48%, hsl(0,0%,27%) 100%);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.58), inset 0 1px 2px rgba(255,255,255,0.36);
+      transform: translate(-50%, -50%);
+      transition: transform 45ms ease-out, box-shadow 80ms ease-out;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    #joystick-knob.active {
+      box-shadow: 0 4px 9px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.4), 0 0 0 2px rgba(255,255,255,0.10);
+    }
+    
+    #apad {
+      right: var(--controls-inset);
+      bottom: var(--controls-inset);
+      display: grid;
+      grid-template-columns: repeat(2, var(--action-size));
+      grid-template-rows: repeat(2, var(--action-size));
+      gap: var(--control-gap);
+      justify-items: center;
+      align-items: center;
+    }
+
+    .control-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      padding: 0;
+      border: 0;
+      background-color: var(--color-gray);
+      color: white;
+      font-family: inherit;
+      font-weight: bold;
+      line-height: 1;
+      text-align: center;
+      -webkit-appearance: none;
+      appearance: none;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #apad > .control-button {
+      width: var(--action-size);
+      height: var(--action-size);
+      border-radius: 50%;
+      font-size: 0.7rem;
+    }
+
+    #apad-shift {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    #apad-escape {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    #apad-enter {
+      grid-column: 1 / span 2;
+      grid-row: 2;
+      justify-self: center;
+      font-size: 1rem;
+    }
+    
+    #shortcut-pad {
+      left: var(--controls-inset);
+      bottom: calc(var(--controls-inset) + (2 * var(--controls-size)) + var(--utility-dpad-gap));
+      display: flex;
+      align-items: center;
+      gap: var(--small-gap);
+    }
+
+    #shortcut-pad .control-button {
+      width: var(--shortcut-size);
+      height: var(--shortcut-size);
+      border-radius: 50%;
+      font-size: 0.68rem;
+    }
+    
+    #numpad-wrap {
+      right: var(--controls-inset);
+      bottom: calc(var(--controls-inset) + (2 * var(--action-size)) + var(--control-gap) + var(--numpad-action-gap));
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--small-gap);
+    }
+
+    #numpad-toggle {
+      width: calc((4 * var(--numpad-size)) + (3 * var(--small-gap)));
+      min-height: 1.25rem;
+      height: calc(var(--numpad-size) * 0.65);
+      padding: 0 0.25rem;
+      border: 0;
+      border-radius: 0.35rem;
+      background: var(--color-gray);
+      color: white;
+      font-family: inherit;
+      font-size: 0.65rem;
+      font-weight: bold;
+      line-height: 1;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #numpad-panel {
+      display: none;
+      grid-template-columns: repeat(4, var(--numpad-size));
+      grid-template-rows: repeat(4, var(--numpad-size));
+      gap: var(--small-gap);
+    }
+
+    #numpad-wrap.open #numpad-panel {
+      display: grid;
+    }
+
+    #numpad-panel .control-button {
+      width: var(--numpad-size);
+      height: var(--numpad-size);
+      border-radius: 0.4rem;
+      font-size: 0.72rem;
+    }
+
+    #apad > .control-button:not(.active),
+    #shortcut-pad .control-button:not(.active),
+    #numpad-panel .control-button:not(.active) {
+      opacity: 0.4;
+    }
+
+    .control-button.active {
+      opacity: 1 !important;
+    }
+
+    @media (orientation: landscape) {
+      #shortcut-pad {
+        top: calc(var(--controls-inset) + 2.75rem);
+        bottom: auto;
+      }
+      
+      #numpad-wrap {
+        top: var(--controls-inset);
+        bottom: auto;
+        flex-direction: column;
+      }
+    }
+  </style>
+<script type="text/javascript" nonce="07226c5c27f2421e95d0fdaea1d" src="//local.adguard.org?ts=1792918335785&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000008a1081f58d5ee463f78b5ed6%26fn%3Dindex_touch_fixed.html%26cd%3Dattachment%26ts%3D498041%26p%3Dfs%26cid%3D1%26sig%3D02bcdeaea4046e24a5d0ae389cef7c4970b68bc9250635e6c93d7b6cfe66952d%26v%3D0&amp;app=org.cromite.cromite&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-ua=TW96aWxsYS81LjAgKExpbnV4OyBBbmRyb2lkIDEwOyBLKSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTQ4LjAuMC4wIE1vYmlsZSBTYWZhcmkvNTM3LjM2&amp;st-ch-brands=W3siYnJhbmQiOiJDaHJvbWl1bSIsInZlcnNpb24iOiIxNDgifSwgeyJicmFuZCI6Ikdvb2dsZSBDaHJvbWUiLCJ2ZXJzaW9uIjoiMTQ4In0sIHsiYnJhbmQiOiJOb3RcL0EpQnJhbmQiLCJ2ZXJzaW9uIjoiOTkifV0=&amp;st-ch-mobile=dHJ1ZQ==&amp;st-ch-platform=QW5kcm9pZA==&amp;st-wrtc&amp;st-loc&amp;st-ref=aHR0cHM6Ly9jaGF0Z3B0LmNvbS8=&amp;st-dnt"></script><script type="text/javascript" nonce="07226c5c27f2421e95d0fdaea1d" src="//local.adguard.org?ts=1792918335785&amp;name=AdsBypasser&amp;name=AdGuard%20Popup%20Blocker&amp;name=AdGuard%20Extra&amp;type=user-script"></script></head>
+<body>
+  <div id="status"></div>
+
+  <div id="viewport">
+    <div id="controls">
+      <button id="controls-fullscreen" class="unselectable" type="button" aria-label="Fullscreen">
+        <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="25" height="25"><path d="M13.5 13.5H10m3.5 0V10m0 3.5l-4-4m.5-8h3.5m0 0V5m0-3.5l-4 4M5 1.5H1.5m0 0V5m0-3.5l4 4m-4 4.5v3.5m0 0H5m-3.5 0l4-4" stroke="currentColor"></path></svg>
+      </button>
+    </div>
+    <canvas id="canvas" tabindex="-1" class="unselectable"></canvas>
+
+    <div id="dpad" class="unselectable" aria-label="Virtual joystick">
+      <div class="joystick-base" aria-hidden="true">
+        <div id="joystick-knob" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div id="shortcut-pad" class="unselectable" aria-label="Shortcut keys">
+      <div id="shortcut-f1" class="control-button" data-key="F1">F1</div>
+      <div id="shortcut-f12" class="control-button" data-key="F12">F12</div>
+      <div id="shortcut-f" class="control-button" data-key="KeyF">F</div>
+      <div id="shortcut-g" class="control-button" data-key="KeyG">G</div>
+    </div>
+
+    <div id="numpad-wrap" class="unselectable">
+      <button id="numpad-toggle" type="button" aria-expanded="false" aria-controls="numpad-panel">NUM +</button>
+      <div id="numpad-panel" aria-label="Numpad keys">
+        <div class="control-button" data-key="Numpad7">7</div>
+        <div class="control-button" data-key="Numpad8">8</div>
+        <div class="control-button" data-key="Numpad9">9</div>
+        <div class="control-button" data-key="NumpadDivide">÷</div>
+        <div class="control-button" data-key="Numpad4">4</div>
+        <div class="control-button" data-key="Numpad5">5</div>
+        <div class="control-button" data-key="Numpad6">6</div>
+        <div class="control-button" data-key="NumpadMultiply">×</div>
+        <div class="control-button" data-key="Numpad1">1</div>
+        <div class="control-button" data-key="Numpad2">2</div>
+        <div class="control-button" data-key="Numpad3">3</div>
+        <div class="control-button" data-key="NumpadSubtract">−</div>
+        <div class="control-button" data-key="Numpad0">0</div>
+        <div class="control-button" data-key="NumpadDecimal">.</div>
+        <div class="control-button" data-key="NumpadEnter">↵</div>
+        <div class="control-button" data-key="NumpadAdd">+</div>
+      </div>
+    </div>
+
+    <div id="apad" class="unselectable" aria-label="Action keys">
+      <div id="apad-shift" class="control-button" data-key="ShiftLeft">SHIFT</div>
+      <div id="apad-escape" class="control-button" data-key="Escape">ESC</div>
+      <div id="apad-enter" class="control-button" data-key="Enter">⏎</div>
+    </div>
+  </div>
+
+<script async type="text/javascript" src="index.js"></script>
+
+<script>
+const hasTouchscreen = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+const preventNativeKeys = ['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft', ' ', 'F12'];
+const canvas = document.getElementById('canvas');
+const heldKeys = new Map();
+const activeTouches = new Map();
+const activeNodeCounts = new Map();
+let easyrpgPlayer;
+
+// Launch the Player and configure it.
+window.addEventListener('load', () => {
+  createEasyRpgPlayer({
+    game: undefined,
+    saveFs: undefined
+  }).then(Module => {
+    easyrpgPlayer = Module;
+    easyrpgPlayer.initApi();
+    canvas.focus();
+  });
+});
+
+// Make EasyRPG player embeddable.
+canvas.addEventListener('mouseenter', () => canvas.focus());
+canvas.addEventListener('click', () => canvas.focus());
+
+// Handle clicking on the fullscreen button.
+document.querySelector('#controls-fullscreen').addEventListener('click', () => {
+  const viewport = document.getElementById('viewport');
+  if (viewport.requestFullscreen) {
+    viewport.requestFullscreen();
+  }
+});
+
+// Show/hide the numpad.
+const numpadWrap = document.getElementById('numpad-wrap');
+const numpadToggle = document.getElementById('numpad-toggle');
+numpadToggle.addEventListener('touchstart', event => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const isOpen = numpadWrap.classList.toggle('open');
+  numpadToggle.textContent = isOpen ? 'NUM −' : 'NUM +';
+  numpadToggle.setAttribute('aria-expanded', String(isOpen));
+}, { passive: false });
+
+/** Simulate a keyboard event on the emscripten canvas. */
+function simulateKeyboardEvent(eventType, code) {
+  const event = new Event(eventType, { bubbles: true });
+  event.code = code;
+  canvas.dispatchEvent(event);
+}
+
+function pressKey(code) {
+  const count = heldKeys.get(code) || 0;
+  if (count === 0) {
+    simulateKeyboardEvent('keydown', code);
+  }
+  heldKeys.set(code, count + 1);
+}
+
+function releaseKey(code) {
+  const count = heldKeys.get(code) || 0;
+  if (count <= 1) {
+    if (count === 1) {
+      simulateKeyboardEvent('keyup', code);
+    }
+    heldKeys.delete(code);
+  } else {
+    heldKeys.set(code, count - 1);
+  }
+}
+
+function activateNode(node) {
+  if (!node) return;
+  const count = activeNodeCounts.get(node) || 0;
+  activeNodeCounts.set(node, count + 1);
+  node.classList.add('active');
+}
+
+function deactivateNode(node) {
+  if (!node) return;
+  const count = activeNodeCounts.get(node) || 0;
+  if (count <= 1) {
+    activeNodeCounts.delete(node);
+    node.classList.remove('active');
+  } else {
+    activeNodeCounts.set(node, count - 1);
+  }
+}
+
+/**
+ * Set the keys and visual elements currently held by a touch.
+ * Shared key counts prevent one finger releasing a key still held by another.
+ */
+function setTouchState(touchId, codes, nodes = [], isDpad = false) {
+  const previous = activeTouches.get(touchId);
+  const oldCodes = new Set(previous ? previous.codes : []);
+  const newCodes = new Set(codes);
+  const oldNodes = new Set(previous ? previous.nodes : []);
+  const newNodes = new Set(nodes);
+
+  for (const code of oldCodes) {
+    if (!newCodes.has(code)) releaseKey(code);
+  }
+  for (const code of newCodes) {
+    if (!oldCodes.has(code)) pressKey(code);
+  }
+  for (const node of oldNodes) {
+    if (!newNodes.has(node)) deactivateNode(node);
+  }
+  for (const node of newNodes) {
+    if (!oldNodes.has(node)) activateNode(node);
+  }
+
+  activeTouches.set(touchId, {
+    codes: [...newCodes],
+    nodes: [...newNodes],
+    isDpad
+  });
+}
+
+function releaseTouch(touchId) {
+  if (!activeTouches.has(touchId)) return;
+
+  const state = activeTouches.get(touchId);
+  setTouchState(touchId, [], [], false);
+  activeTouches.delete(touchId);
+
+  if (state.isDpad) resetJoystickKnob();
+}
+
+const dpad = document.getElementById('dpad');
+const joystickKnob = document.getElementById('joystick-knob');
+
+const dpadDirections = {
+  0: { codes: ['ArrowRight'] },
+  1: { codes: ['ArrowDown', 'ArrowRight'] },
+  2: { codes: ['ArrowDown'] },
+  3: { codes: ['ArrowDown', 'ArrowLeft'] },
+  4: { codes: ['ArrowLeft'] },
+  5: { codes: ['ArrowUp', 'ArrowLeft'] },
+  6: { codes: ['ArrowUp'] },
+  7: { codes: ['ArrowUp', 'ArrowRight'] }
+};
+
+function resetJoystickKnob() {
+  joystickKnob.style.transform = 'translate(-50%, -50%)';
+}
+
+function updateDpadTouch(touchId, clientX, clientY) {
+  const rect = dpad.getBoundingClientRect();
+  const dx = (clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+  const dy = (clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+  const distance = Math.hypot(dx, dy);
+  const deadZone = 0.20;
+
+  // Keep the knob near the center when the finger is inside the dead zone.
+  if (distance < deadZone) {
+    resetJoystickKnob();
+    setTouchState(touchId, [], [], true);
+    return;
+  }
+
+  const travel = Math.min(distance, 1);
+  const offsetX = (dx / distance) * rect.width * 0.23 * travel;
+  const offsetY = (dy / distance) * rect.height * 0.23 * travel;
+
+  joystickKnob.style.transform =
+    `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
+
+  const angle = Math.atan2(dy, dx);
+  const octant = (Math.round(angle / (Math.PI / 4)) + 8) % 8;
+
+  setTouchState(touchId, dpadDirections[octant].codes, [joystickKnob], true);
+}
+
+// Handle touches on the joystick.
+dpad.addEventListener('touchstart', event => {
+  event.preventDefault();
+
+  for (const touch of event.changedTouches) {
+    updateDpadTouch(touch.identifier, touch.clientX, touch.clientY);
+  }
+}, { passive: false });
+
+// Bind every non-D-pad control to its keyboard code.
+if (hasTouchscreen) {
+  for (const node of document.querySelectorAll('[data-key]')) {
+    if (node.closest('#dpad')) continue;
+
+    node.addEventListener('touchstart', event => {
+      event.preventDefault();
+
+      for (const touch of event.changedTouches) {
+        setTouchState(
+          touch.identifier,
+          [node.dataset.key],
+          [node],
+          false
+        );
+      }
+    }, { passive: false });
+  }
+}
+
+// Track joystick movement even when the finger moves outside the D-pad.
+document.addEventListener('touchmove', event => {
+  for (const touch of event.changedTouches) {
+    const state = activeTouches.get(touch.identifier);
+
+    if (state && state.isDpad) {
+      event.preventDefault();
+      updateDpadTouch(touch.identifier, touch.clientX, touch.clientY);
+    }
+  }
+}, { passive: false });
+
+// Release keys when fingers leave the controls.
+document.addEventListener('touchend', event => {
+  for (const touch of event.changedTouches) {
+    releaseTouch(touch.identifier);
+  }
+}, { passive: false });
+
+document.addEventListener('touchcancel', event => {
+  for (const touch of event.changedTouches) {
+    releaseTouch(touch.identifier);
+  }
+}, { passive: false });
+
+// Release all held keys if the page loses focus.
+window.addEventListener('blur', () => {
+  for (const touchId of [...activeTouches.keys()]) {
+    releaseTouch(touchId);
+  }
+});
+
+// Stop the browser's press-and-hold context menu on the on-screen controls.
+document.addEventListener('contextmenu', event => {
+  if (event.target.closest('#controls, #dpad, #apad, #shortcut-pad, #numpad-wrap, #viewport')) {
+    event.preventDefault();
+  }
+});
+
+/** @type {{[key: number]: Gamepad}} */
+let gamepads = {};
+const haveEvents = 'ongamepadconnected' in window;
+
+function addGamepad(gamepad) {
+  if (gamepad == undefined) return;
+  gamepads[gamepad.index] = gamepad;
+  updateTouchControlsVisibility();
+}
+
+function removeGamepad(gamepad) {
+  if (gamepad == undefined) return;
+  delete gamepads[gamepad.index];
+  updateTouchControlsVisibility();
+}
+
+function getGamepads() {
+  return navigator.getGamepads
+    ? navigator.getGamepads()
+    : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+}
+
+function scanGamePads() {
+  const pads = getGamepads();
+  for (let i = 0; i < pads.length; i++) {
+    if (pads[i]) {
+      if (pads[i].index in gamepads) {
+        gamepads[pads[i].index] = pads[i];
+      } else {
+        addGamepad(pads[i]);
+      }
+    }
+  }
+}
+
+if (!haveEvents) {
+  setInterval(scanGamePads, 500);
+}
+
+window.addEventListener('gamepadconnected', event => addGamepad(event.gamepad));
+window.addEventListener('gamepaddisconnected', event => removeGamepad(event.gamepad));
+
+function updateTouchControlsVisibility() {
+  const controls = document.querySelectorAll('#dpad, #apad, #shortcut-pad, #numpad-wrap');
+  if (hasTouchscreen && Object.keys(gamepads).length === 0) {
+    for (const element of controls) element.style.display = '';
+  } else {
+    for (const element of controls) element.style.display = 'none';
+  }
+}
+
+if (!hasTouchscreen) {
+  // Prevent scrolling when pressing specific keys on a physical keyboard.
+  window.addEventListener('keydown', event => {
+    if (preventNativeKeys.includes(event.key)) event.preventDefault();
+  });
+
+  canvas.addEventListener('contextmenu', event => event.preventDefault());
+}
+
+updateTouchControlsVisibility();
+</script>
+</body>
+</html>
