@@ -40,10 +40,12 @@ Edit the CSS variables at the beginning of the `<style>` block in `index.html`. 
 
 | Group | Controls |
 | --- | --- |
-| `utility` | Fullscreen, shortcut buttons, and D-pad mode toggle |
+| `utility` | Shortcut buttons and D-pad mode toggle |
 | `dpad` | Joystick or four-way D-pad |
 | `action` | Shift, Escape, and Enter |
 | `numpad` | Numpad toggle and keypad |
+
+The fullscreen button stays at the top-left of the screen and is not part of an adjustable group.
 
 Each group has six variables: portrait `x`, `y`, and `scale`, and landscape `x`, `y`, and `scale`. The variable pattern is `--<group>-group-<orientation>-<setting>`. For example, `--dpad-group-portrait-x` controls the D-pad's horizontal offset in portrait. The default offsets are `0px` and the default scale is `1` for every group and orientation.
 
