@@ -144,10 +144,11 @@
     }
 
     #controls {
-      position: absolute;
-      top: 0;
-      left: 0;
+      position: fixed;
+      top: 0.5rem;
+      left: var(--utility-inset);
       text-align: left;
+      z-index: 30;
     }
 
     #controls button {
@@ -520,12 +521,12 @@
   <div id="status"></div>
 
   <div id="viewport">
-    <div id="utility-group" class="unselectable" role="group" aria-label="Utility controls">
-      <div id="controls">
-        <button id="controls-fullscreen" class="unselectable" type="button" aria-label="Fullscreen">
-          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="25" height="25"><path d="M13.5 13.5H10m3.5 0V10m0 3.5l-4-4m.5-8h3.5m0 0V5m0-3.5l-4 4M5 1.5H1.5m0 0V5m0-3.5l4 4m-4 4.5v3.5m0 0H5m-3.5 0l4-4" stroke="currentColor"></path></svg>
-        </button>
-      </div>
+    <div id="controls">
+      <button id="controls-fullscreen" class="unselectable" type="button" aria-label="Fullscreen">
+        <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" width="25" height="25"><path d="M13.5 13.5H10m3.5 0V10m0 3.5l-4-4m.5-8h3.5m0 0V5m0-3.5l-4 4M5 1.5H1.5m0 0V5m0-3.5l4 4m-4 4.5v3.5m0 0H5m-3.5 0l4-4" stroke="currentColor"></path></svg>
+      </button>
+    </div>
+    <div id="utility-group" class="unselectable" role="group" aria-label="Shortcut controls">
       <div id="shortcut-pad" class="unselectable" role="group" aria-label="Shortcut keys">
         <button id="shortcut-f1" class="control-button" type="button" data-key="F1" aria-label="F1" aria-pressed="false">F1</button>
         <button id="shortcut-f12" class="control-button" type="button" data-key="F12" aria-label="F12" aria-pressed="false">F12</button>
