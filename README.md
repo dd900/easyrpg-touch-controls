@@ -13,16 +13,17 @@ Custom mobile touch controls for the EasyRPG player, designed to make RPG Maker 
 
 ## Controls
 
-The touch controls are intended for touch-capable mobile browsers. When a touchscreen is detected and no gamepad is connected, the controls are shown. They are hidden in non-touch browser environments and while a gamepad is connected.
+The touch controls are intended for touch-capable browsers. When a touchscreen is detected and no gamepad is connected, the controls are shown. They are hidden in non-touch browser environments and while a gamepad is connected. The fullscreen button remains available independently.
 
 * **Joystick:** Move in a direction to send the corresponding arrow-key input. Diagonal movement sends two arrow keys.
-* **D-pad mode:** Use the D-PAD button in the utility group to switch between the joystick and four separate directional buttons.
+* **D-pad mode:** Use the D-PAD button in the utility group to switch between the joystick and four directional controls. D-pad mode sends one direction at a time.
 * **Action buttons:** Send Shift, Escape, and Enter.
 * **Shortcut buttons:** Send F1, F12, F, and G.
 * **Numpad:** Select NUM + to open the keypad, then select it again to close it.
 * **Fullscreen:** Toggle fullscreen where the browser supports the Fullscreen API.
 
 Buttons support pointer input, including touch and mouse. The controls also suppress browser scrolling and long-press behavior while being used.
+The directional control can also be focused and operated with the arrow keys.
 
 ## Installation
 
@@ -41,27 +42,58 @@ Edit the CSS variables at the beginning of the `<style>` block in `index.html`. 
 | Group | Controls |
 | --- | --- |
 | `utility` | Shortcut buttons and D-pad mode toggle |
-| `dpad` | Joystick or four-way D-pad |
+| `directional` | Joystick or four-way D-pad |
 | `action` | Shift, Escape, and Enter |
 | `numpad` | Numpad toggle and keypad |
 
-The fullscreen button stays at the top-left of the screen and is not part of an adjustable group.
+The fullscreen button stays at the top-left of the screen and is not part of an adjustable group. Its position is set with the inset variables below.
 
-Each group has six variables: portrait `x`, `y`, and `scale`, and landscape `x`, `y`, and `scale`. The variable pattern is `--<group>-group-<orientation>-<setting>`. For example, `--dpad-group-portrait-x` controls the D-pad's horizontal offset in portrait. The default offsets are `0px` and the default scale is `1` for every group and orientation.
+Each group has six variables: portrait `x`, `y`, and `scale`, and landscape `x`, `y`, and `scale`. The variable pattern is `--<group>-group-<orientation>-<setting>`. For example, `--directional-group-portrait-x` controls the joystick or D-pad's horizontal offset in portrait. The default offsets are `0px` and the default scale is `1` for every group and orientation.
 
-For example, to move the portrait D-pad 12 pixels right and 8 pixels up, and make it 10% larger, set:
+For example, to move the portrait joystick or D-pad 12 pixels right and 8 pixels up, and make it 10% larger, set:
 
 ```css
---dpad-group-portrait-x: 12px;
---dpad-group-portrait-y: -8px;
---dpad-group-portrait-scale: 1.1;
+--directional-group-portrait-x: 12px;
+--directional-group-portrait-y: -8px;
+--directional-group-portrait-scale: 1.1;
 ```
 
 Positive `x` moves a group right; positive `y` moves it down. Negative values move it left or up. Offsets accept CSS lengths such as `px` or `rem`. A scale of `1` keeps the default size, a value above `1` enlarges the whole group, and a value between `0` and `1` shrinks it. Scale values have no unit. Use the `-landscape-` variables to set different adjustments for landscape; the page switches between the two sets automatically when its orientation changes.
 
-Groups stay anchored to their existing screen edges. Scaling expands or shrinks from the group's anchor: top-left for utility, bottom-left for D-pad, bottom-right for action, and top-right for numpad. Adjust the offsets if a larger or smaller group needs repositioning. Each group keeps its existing internal arrangement and spacing; there are no per-gap settings.
+Groups stay anchored to their existing screen edges. Scaling expands or shrinks from the group's anchor: top-left for utility, bottom-left for directional, bottom-right for action, and top-right for numpad. Adjust the offsets if a larger or smaller group needs repositioning. On short landscape screens, shortcuts use a compact row and the open numpad extends to the left.
 
-The controls also have responsive base sizes. The `--controls-size-portrait` and `--controls-size-landscape` variables near the same section set the sizing basis used by the controls; their minimum and maximum values are controlled by the corresponding `--controls-size-min`, `--controls-size-max`, `--controls-size-landscape-min`, and `--controls-size-landscape-max` variables. For most adjustments, use the group's `scale` setting so only that group changes size.
+### Edge insets
+
+Each group has its own inset variables, which set its distance from the screen edges. The safe area (camera cutout) is not taken into account, so controls can sit under it. If a notch covers a group, increase that group's inset.
+
+| Variables | Moves |
+| --- | --- |
+| `--fullscreen-inset-top`, `--fullscreen-inset-left` | Fullscreen button |
+| `--utility-inset-top`, `--utility-inset-left` | Shortcut buttons and D-pad mode toggle |
+| `--shortcut-pad-offset-top` | Shortcut buttons, measured down from the top of the utility group |
+| `--directional-inset-left`, `--directional-inset-bottom` | Joystick or D-pad |
+| `--action-inset-right`, `--action-inset-bottom` | Shift, Escape, and Enter |
+| `--numpad-inset-top`, `--numpad-inset-right` | Numpad toggle and keypad |
+
+In landscape, `--fullscreen-inset-left`, `--utility-inset-left`, and `--shortcut-pad-offset-top` are overridden inside the landscape `@media` rule near the top of the `<style>` block. Edit them there for landscape.
+
+### Sizes
+
+The controls have responsive base sizes. The `--base-size-portrait` and `--base-size-landscape` variables set the sizing basis shared by all groups; their minimum and maximum values are controlled by `--base-size-min`, `--base-size-max`, `--base-size-landscape-min`, and `--base-size-landscape-max`. For most adjustments, use the group's `scale` setting so only that group changes size.
+
+Individual sizes are derived from the base size and can be overridden in the same place:
+
+| Variable | Controls |
+| --- | --- |
+| `--action-button-size` | Diameter of the Shift, Escape, and Enter buttons |
+| `--directional-size` | Overall size of the joystick or D-pad area |
+| `--joystick-base-size`, `--joystick-knob-size`, `--joystick-knob-color` | Joystick base and knob; sizes are relative to the area |
+| `--dpad-size` | Four-way D-pad cross; relative to the area |
+| `--shortcut-base-size`, `--shortcut-button-width`, `--shortcut-button-height` | Shortcut buttons |
+| `--numpad-key-size` | Numpad keys |
+| `--control-gap` | Spacing between buttons in the shortcut pad and numpad |
+
+The `--<group>-current-*` variables are internal; do not change them.
 
 ## Compatibility
 

@@ -6,100 +6,123 @@
   <title>EasyRPG Player</title>
   <style>
     :root {
-      --color-gray: hsl(0, 0%, 55%);
-
-      --utility-group-portrait-x: 0px;
-      --utility-group-portrait-y: 0px;
-      --utility-group-portrait-scale: 1;
-      --utility-group-landscape-x: 0px;
-      --utility-group-landscape-y: 0px;
-      --utility-group-landscape-scale: 1;
-      --utility-group-x: var(--utility-group-portrait-x);
-      --utility-group-y: var(--utility-group-portrait-y);
-      --utility-group-scale: var(--utility-group-portrait-scale);
-      --dpad-group-portrait-x: 0px;
-      --dpad-group-portrait-y: 0px;
-      --dpad-group-portrait-scale: 1;
-      --dpad-group-landscape-x: 0px;
-      --dpad-group-landscape-y: 0px;
-      --dpad-group-landscape-scale: 1;
-      --dpad-group-x: var(--dpad-group-portrait-x);
-      --dpad-group-y: var(--dpad-group-portrait-y);
-      --dpad-group-scale: var(--dpad-group-portrait-scale);
-      --action-group-portrait-x: 0px;
-      --action-group-portrait-y: 0px;
-      --action-group-portrait-scale: 1;
-      --action-group-landscape-x: 0px;
-      --action-group-landscape-y: 0px;
-      --action-group-landscape-scale: 1;
-      --action-group-x: var(--action-group-portrait-x);
-      --action-group-y: var(--action-group-portrait-y);
-      --action-group-scale: var(--action-group-portrait-scale);
-      --numpad-group-portrait-x: 0px;
-      --numpad-group-portrait-y: 0px;
-      --numpad-group-portrait-scale: 1;
-      --numpad-group-landscape-x: 0px;
-      --numpad-group-landscape-y: 0px;
-      --numpad-group-landscape-scale: 1;
-      --numpad-group-x: var(--numpad-group-portrait-x);
-      --numpad-group-y: var(--numpad-group-portrait-y);
-      --numpad-group-scale: var(--numpad-group-portrait-scale);
-
-      --controls-size-portrait: 10vh;
-      --controls-size-landscape: 20vh;
-      --controls-size: var(--controls-size-portrait);
-      --controls-size-min: 3.5rem;
-      --controls-size-max: 6rem;
-      --controls-size-landscape-min: 4rem;
-      --controls-size-landscape-max: 7rem;
-      --action-size: calc(var(--controls-size) * 0.82);
-      --joystick-size: calc(var(--shortcut-button-width) + var(--shortcut-button-width) + max(0.18rem, calc(var(--controls-size) * 0.05)));
-      --joystick-base-size: 100%;
-      --joystick-knob-color: hsl(216, 32%, 25%);
-      --joystick-knob-size: 50%;
-      --shortcut-size-min: 2.25rem;
-      --shortcut-size-max: 3rem;
-      --shortcut-size: clamp(var(--shortcut-size-min), calc(var(--controls-size) * 0.43), var(--shortcut-size-max));
-      --shortcut-button-width: calc(var(--shortcut-size) * 1.65);
-      --shortcut-button-height: clamp(1.65rem, calc(var(--shortcut-size) * 0.75), 2rem);
-      --numpad-size-min: 1.6rem;
-      --numpad-size-max: 2.5rem;
-      --numpad-size: clamp(var(--numpad-size-min), calc(var(--controls-size) * 0.43), var(--numpad-size-max));
+      /* Theme */
+      --status-color: hsl(0, 0%, 55%);
       --button-rest-top: hsl(213, 24%, 43%);
       --button-rest-bottom: hsl(216, 32%, 25%);
       --button-active-top: hsl(211, 48%, 61%);
       --button-active-bottom: hsl(215, 48%, 38%);
       --button-edge: rgba(190, 216, 246, 0.46);
       --button-highlight: rgba(255, 255, 255, 0.2);
-      --utility-inset: 0.5rem;
-      --controls-inset: 1rem;
+      --joystick-knob-color: hsl(216, 32%, 25%);
+
+      /* Portrait values */
+      --utility-group-portrait-x: 0px;
+      --utility-group-portrait-y: 0px;
+      --utility-group-portrait-scale: 1;
+      --directional-group-portrait-x: 0px;
+      --directional-group-portrait-y: 0px;
+      --directional-group-portrait-scale: 1;
+      --action-group-portrait-x: 0px;
+      --action-group-portrait-y: 0px;
+      --action-group-portrait-scale: 1;
+      --numpad-group-portrait-x: 0px;
+      --numpad-group-portrait-y: 0px;
+      --numpad-group-portrait-scale: 1;
+
+      /* Landscape values */
+      --utility-group-landscape-x: 0px;
+      --utility-group-landscape-y: 0px;
+      --utility-group-landscape-scale: 1;
+      --directional-group-landscape-x: 0px;
+      --directional-group-landscape-y: 0px;
+      --directional-group-landscape-scale: 1;
+      --action-group-landscape-x: 0px;
+      --action-group-landscape-y: 0px;
+      --action-group-landscape-scale: 1;
+      --numpad-group-landscape-x: 0px;
+      --numpad-group-landscape-y: 0px;
+      --numpad-group-landscape-scale: 1;
+
+      /* Default to portrait values, do not change*/
+      --utility-current-x: var(--utility-group-portrait-x);
+      --utility-current-y: var(--utility-group-portrait-y);
+      --utility-current-scale: var(--utility-group-portrait-scale);
+      --directional-current-x: var(--directional-group-portrait-x);
+      --directional-current-y: var(--directional-group-portrait-y);
+      --directional-current-scale: var(--directional-group-portrait-scale);
+      --action-current-x: var(--action-group-portrait-x);
+      --action-current-y: var(--action-group-portrait-y);
+      --action-current-scale: var(--action-group-portrait-scale);
+      --numpad-current-x: var(--numpad-group-portrait-x);
+      --numpad-current-y: var(--numpad-group-portrait-y);
+      --numpad-current-scale: var(--numpad-group-portrait-scale);
+
+      /* Internal helpers, do not change */
+      --viewport-height: 1vh;
+      --control-gap: max(0.18rem, calc(var(--base-size) * 0.05));
+
+      /* Sizing */
+      --base-size-min: 3.5rem;
+      --base-size-max: 6rem;
+      --base-size-landscape-min: 4rem;
+      --base-size-landscape-max: 7rem;
+      --base-size-portrait: calc(10 * var(--viewport-height));
+      --base-size-landscape: calc(20 * var(--viewport-height));
+      --base-size: clamp(var(--base-size-min), var(--base-size-portrait), var(--base-size-max));
+
+      --action-button-size: calc(var(--base-size) * 0.82);
+      --directional-size: calc((var(--shortcut-button-width) + var(--shortcut-button-width) + var(--control-gap)) * 1.2);
+      --joystick-base-size: 100%;
+      --joystick-knob-size: 50%;
+      --dpad-size: 100%;
+      --shortcut-base-size-min: 2.25rem;
+      --shortcut-base-size-max: 3rem;
+      --shortcut-base-size: clamp(var(--shortcut-base-size-min), calc(var(--base-size) * 0.43), var(--shortcut-base-size-max));
+      --shortcut-button-width: calc(var(--shortcut-base-size) * 1.65);
+      --shortcut-button-height: clamp(1.65rem, calc(var(--shortcut-base-size) * 0.75), 2rem);
+      --numpad-key-size-min: 1.6rem;
+      --numpad-key-size-max: 2.5rem;
+      --numpad-key-size: clamp(var(--numpad-key-size-min), calc(var(--base-size) * 0.43), var(--numpad-key-size-max));
+
+      /* Distance from the screen edges (safe area is added automatically) */
+      --fullscreen-inset-top: 0.5rem;
+      --fullscreen-inset-left: 0.5rem;
+      --utility-inset-top: 0.5rem;
+      --utility-inset-left: 0.5rem;
+      --shortcut-pad-offset-top: 2.5rem;
+      --directional-inset-left: 0.5rem;
+      --directional-inset-bottom: 1rem;
+      --action-inset-right: 1rem;
+      --action-inset-bottom: 1rem;
+      --numpad-inset-top: 1rem;
       --numpad-inset-right: 0.5rem;
-      --joystick-inset-left: var(--utility-inset);
     }
 
     @supports (height: 100svh) {
       :root {
-        --controls-size-portrait: clamp(var(--controls-size-min), 10svh, var(--controls-size-max));
-        --controls-size-landscape: clamp(var(--controls-size-landscape-min), 20svh, var(--controls-size-landscape-max));
+        --viewport-height: 1svh;
       }
     }
 
     @media (orientation: landscape) {
       :root {
-        --controls-size: var(--controls-size-landscape);
-        --utility-inset: 0.25rem;
-        --utility-group-x: var(--utility-group-landscape-x);
-        --utility-group-y: var(--utility-group-landscape-y);
-        --utility-group-scale: var(--utility-group-landscape-scale);
-        --dpad-group-x: var(--dpad-group-landscape-x);
-        --dpad-group-y: var(--dpad-group-landscape-y);
-        --dpad-group-scale: var(--dpad-group-landscape-scale);
-        --action-group-x: var(--action-group-landscape-x);
-        --action-group-y: var(--action-group-landscape-y);
-        --action-group-scale: var(--action-group-landscape-scale);
-        --numpad-group-x: var(--numpad-group-landscape-x);
-        --numpad-group-y: var(--numpad-group-landscape-y);
-        --numpad-group-scale: var(--numpad-group-landscape-scale);
+        --base-size: clamp(var(--base-size-landscape-min), var(--base-size-landscape), var(--base-size-landscape-max));
+        --fullscreen-inset-left: 0.25rem;
+        --utility-inset-left: 0.25rem;
+        --shortcut-pad-offset-top: 3.25rem;
+        --utility-current-x: var(--utility-group-landscape-x);
+        --utility-current-y: var(--utility-group-landscape-y);
+        --utility-current-scale: var(--utility-group-landscape-scale);
+        --directional-current-x: var(--directional-group-landscape-x);
+        --directional-current-y: var(--directional-group-landscape-y);
+        --directional-current-scale: var(--directional-group-landscape-scale);
+        --action-current-x: var(--action-group-landscape-x);
+        --action-current-y: var(--action-group-landscape-y);
+        --action-current-scale: var(--action-group-landscape-scale);
+        --numpad-current-x: var(--numpad-group-landscape-x);
+        --numpad-current-y: var(--numpad-group-landscape-y);
+        --numpad-current-scale: var(--numpad-group-landscape-scale);
       }
     }
 
@@ -129,24 +152,30 @@
     }
 
     #status {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
       font-size: 1.5rem;
-      color: var(--color-gray);
+      color: var(--status-color);
       text-align: center;
+      pointer-events: none;
     }
 
     #utility-group {
       position: fixed;
-      top: 0.5rem;
-      left: var(--utility-inset);
-      transform: translate(var(--utility-group-x), var(--utility-group-y)) scale(var(--utility-group-scale));
+      top: var(--utility-inset-top);
+      left: var(--utility-inset-left);
+      transform: translate(var(--utility-current-x), var(--utility-current-y)) scale(var(--utility-current-scale));
       transform-origin: top left;
       z-index: 30;
     }
 
     #controls {
       position: fixed;
-      top: 0.5rem;
-      left: var(--utility-inset);
+      top: var(--fullscreen-inset-top);
+      left: var(--fullscreen-inset-left);
       text-align: left;
       z-index: 30;
     }
@@ -176,10 +205,10 @@
 
     #canvas {
       position: absolute;
-      top: calc(50% + (env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) / 2);
-      left: calc(50% + (env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) / 2);
-      width: calc(100% - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-      height: calc(100% - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
       border: 0;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
@@ -200,11 +229,11 @@
     }
     
     #dpad {
-      left: var(--joystick-inset-left);
-      bottom: var(--controls-inset);
-      width: var(--joystick-size);
-      height: var(--joystick-size);
-      transform: translate(var(--dpad-group-x), var(--dpad-group-y)) scale(var(--dpad-group-scale));
+      left: var(--directional-inset-left);
+      bottom: var(--directional-inset-bottom);
+      width: var(--directional-size);
+      height: var(--directional-size);
+      transform: translate(var(--directional-current-x), var(--directional-current-y)) scale(var(--directional-current-scale));
       transform-origin: bottom left;
       border-radius: 50%;
       touch-action: none;
@@ -240,7 +269,7 @@
 
     #dpad-cross {
       position: absolute;
-      inset: calc((100% - var(--joystick-base-size)) / 2);
+      inset: calc((100% - var(--dpad-size)) / 2);
       display: none;
       pointer-events: none;
     }
@@ -321,14 +350,14 @@
     }
     
     #apad {
-      right: var(--controls-inset);
-      bottom: var(--controls-inset);
-      transform: translate(var(--action-group-x), var(--action-group-y)) scale(var(--action-group-scale));
+      right: var(--action-inset-right);
+      bottom: var(--action-inset-bottom);
+      transform: translate(var(--action-current-x), var(--action-current-y)) scale(var(--action-current-scale));
       transform-origin: bottom right;
       display: grid;
-      grid-template-columns: repeat(2, var(--action-size));
-      grid-template-rows: repeat(2, var(--action-size));
-      gap: max(0.25rem, calc(var(--controls-size) * 0.07));
+      grid-template-columns: repeat(2, var(--action-button-size));
+      grid-template-rows: repeat(2, var(--action-button-size));
+      gap: max(0.25rem, calc(var(--base-size) * 0.07));
       justify-items: center;
       align-items: center;
     }
@@ -360,14 +389,15 @@
     }
 
     .control-button:focus-visible,
-    #controls-fullscreen:focus-visible {
+    #controls-fullscreen:focus-visible,
+    #dpad:focus-visible {
       outline: 2px solid white;
       outline-offset: 3px;
     }
 
     #apad > .control-button {
-      width: var(--action-size);
-      height: var(--action-size);
+      width: var(--action-button-size);
+      height: var(--action-button-size);
       border-radius: 50%;
       font-size: 0.7rem;
     }
@@ -392,13 +422,12 @@
     #shortcut-pad {
       position: absolute;
       left: 0;
-      top: calc(var(--controls-inset) + 1.5rem);
-      bottom: auto;
+      top: var(--shortcut-pad-offset-top);
       display: grid;
       grid-template-columns: repeat(2, var(--shortcut-button-width));
       grid-auto-rows: var(--shortcut-button-height);
-      column-gap: max(0.18rem, calc(var(--controls-size) * 0.05));
-      row-gap: max(0.35rem, calc(max(0.18rem, calc(var(--controls-size) * 0.05)) * 1.5));
+      column-gap: var(--control-gap);
+      row-gap: max(0.35rem, calc(var(--control-gap) * 1.5));
     }
 
     #shortcut-pad .control-button {
@@ -451,17 +480,17 @@
     
     #numpad-wrap {
       position: fixed;
-      top: var(--controls-inset);
+      top: var(--numpad-inset-top);
       right: var(--numpad-inset-right);
-      transform: translate(var(--numpad-group-x), var(--numpad-group-y)) scale(var(--numpad-group-scale));
+      transform: translate(var(--numpad-current-x), var(--numpad-current-y)) scale(var(--numpad-current-scale));
       transform-origin: top right;
       z-index: 20;
     }
 
     #numpad-toggle {
-      width: calc((4 * var(--numpad-size)) + (3 * max(0.18rem, calc(var(--controls-size) * 0.05))));
+      width: calc((4 * var(--numpad-key-size)) + (3 * var(--control-gap)));
       min-height: 1.75rem;
-      height: calc(var(--numpad-size) * 0.75);
+      height: calc(var(--numpad-key-size) * 0.75);
       padding: 0 0.25rem;
       border-radius: 0.45rem;
       font-size: 0.65rem;
@@ -469,12 +498,12 @@
 
     #numpad-panel {
       position: absolute;
-      top: calc(100% + max(0.18rem, calc(var(--controls-size) * 0.05)));
+      top: calc(100% + var(--control-gap));
       right: 0;
       display: none;
-      grid-template-columns: repeat(4, var(--numpad-size));
-      grid-template-rows: repeat(4, var(--numpad-size));
-      gap: max(0.18rem, calc(var(--controls-size) * 0.05));
+      grid-template-columns: repeat(4, var(--numpad-key-size));
+      grid-template-rows: repeat(4, var(--numpad-key-size));
+      gap: var(--control-gap);
       touch-action: none;
     }
 
@@ -483,16 +512,10 @@
     }
 
     #numpad-panel .control-button {
-      width: var(--numpad-size);
-      height: var(--numpad-size);
+      width: var(--numpad-key-size);
+      height: var(--numpad-key-size);
       border-radius: 0.4rem;
       font-size: 0.72rem;
-    }
-
-    #apad > .control-button:not(.active),
-    #shortcut-pad .control-button:not(.active),
-    #numpad-panel .control-button:not(.active) {
-      background: linear-gradient(145deg, var(--button-rest-top), var(--button-rest-bottom));
     }
 
     .control-button.active {
@@ -502,23 +525,36 @@
       box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.38), 0 1px 2px rgba(0, 0, 0, 0.3);
     }
 
-    @media (orientation: portrait) {
-      #shortcut-pad {
-        left: 0;
-      }
-    }
-
-    @media (orientation: landscape) {
-      #shortcut-pad {
-        top: calc(var(--controls-inset) + 2.25rem);
-        bottom: auto;
+    @media (orientation: landscape) and (max-height: 350px) {
+      :root {
+        --shortcut-pad-offset-top: 0px;
+        --shortcut-button-width: min(calc(var(--shortcut-base-size) * 1.65), max(1.5rem, calc((100vw - (4 * var(--numpad-key-size)) - (3 * var(--control-gap)) - 3.5rem) / 5 - var(--control-gap))));
       }
 
+      #utility-group {
+        left: calc(var(--utility-inset-left) + 2.5rem);
+      }
+
+      #shortcut-pad {
+        grid-template-columns: repeat(5, var(--shortcut-button-width));
+      }
+
+      #dpad-mode-toggle {
+        grid-column: auto;
+      }
+
+      #dpad-mode-toggle span:not(.dpad-mode-icon) {
+        display: none;
+      }
+
+      #numpad-panel {
+        right: calc(100% + var(--control-gap));
+      }
     }
   </style>
 </head>
 <body>
-  <div id="status"></div>
+  <div id="status" role="status"></div>
 
   <div id="viewport">
     <div id="controls">
@@ -540,7 +576,7 @@
     </div>
     <canvas id="canvas" tabindex="-1" class="unselectable"></canvas>
 
-    <div id="dpad" class="unselectable" role="group" aria-label="Virtual joystick">
+    <div id="dpad" class="unselectable" role="group" aria-label="Directional control" title="Use arrow keys" tabindex="0">
       <div class="joystick-base" aria-hidden="true">
         <div id="joystick-knob" aria-hidden="true"></div>
       </div>
@@ -584,7 +620,8 @@
 <script async type="text/javascript" src="index.js"></script>
 
 <script>
-const hasTouchscreen = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+const touchPointer = window.matchMedia('(any-pointer: coarse)');
+const hasTouchscreen = () => navigator.maxTouchPoints > 0 || touchPointer.matches;
 const preventNativeKeys = ['ArrowUp', 'ArrowDown', 'ArrowRight', 'ArrowLeft', ' ', 'F12'];
 const canvas = document.getElementById('canvas');
 const keyboardEventData = {
@@ -619,19 +656,21 @@ const keyboardEventData = {
 const heldKeys = new Map();
 const activeTouches = new Map();
 const activeNodeCounts = new Map();
-let easyrpgPlayer;
 let activeDpadTouchId = null;
 
 // Launch the Player and configure it.
-window.addEventListener('load', () => {
-  createEasyRpgPlayer({
-    game: undefined,
-    saveFs: undefined
-  }).then(Module => {
-    easyrpgPlayer = Module;
-    easyrpgPlayer.initApi();
+window.addEventListener('load', async () => {
+  try {
+    const player = await createEasyRpgPlayer({
+      game: undefined,
+      saveFs: undefined
+    });
+    player.initApi();
     canvas.focus();
-  });
+  } catch (error) {
+    document.getElementById('status').textContent = 'Unable to start EasyRPG Player. Check the player files and reload.';
+    console.error('Unable to start EasyRPG Player.', error);
+  }
 });
 
 // Make EasyRPG player embeddable.
@@ -781,12 +820,16 @@ const dpadDirectionNodes = {
   ArrowLeft: document.getElementById('dpad-left'),
   ArrowRight: document.getElementById('dpad-right')
 };
+const dpadKeyboardKeys = new Set();
+const keyboardDpadId = 'keyboard-dpad';
 
 function toggleDpadMode() {
   const useCrossDpad = dpad.classList.toggle('cross-mode');
   dpadModeToggle.classList.toggle('active', useCrossDpad);
   dpadModeToggle.setAttribute('aria-pressed', String(useCrossDpad));
   if (activeDpadTouchId !== null) releaseTouch(activeDpadTouchId);
+  dpadKeyboardKeys.clear();
+  releaseTouch(keyboardDpadId);
 }
 
 dpadModeToggle.addEventListener('pointerdown', event => {
@@ -829,9 +872,23 @@ function updateDpadTouch(touchId, clientX, clientY) {
     return;
   }
 
+  if (dpad.classList.contains('cross-mode')) {
+    const horizontal = Math.abs(dx);
+    const vertical = Math.abs(dy);
+    if (horizontal > 1 || vertical > 1 || (horizontal > 0.34 && vertical > 0.34)) {
+      setTouchState(touchId, [], [], true);
+      return;
+    }
+    const code = horizontal > vertical
+      ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft')
+      : (dy > 0 ? 'ArrowDown' : 'ArrowUp');
+    setTouchState(touchId, [code], [dpadDirectionNodes[code]], true);
+    return;
+  }
+
   const travel = Math.min(distance, 1);
-  const offsetX = (dx / distance) * rect.width * 0.23 * travel;
-  const offsetY = (dy / distance) * rect.height * 0.23 * travel;
+  const offsetX = (dx / distance) * dpad.offsetWidth * 0.23 * travel;
+  const offsetY = (dy / distance) * dpad.offsetHeight * 0.23 * travel;
 
   joystickKnob.style.transform =
     `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
@@ -839,12 +896,38 @@ function updateDpadTouch(touchId, clientX, clientY) {
   const angle = Math.atan2(dy, dx);
   const octant = (Math.round(angle / (Math.PI / 4)) + 8) % 8;
   const codes = dpadDirections[octant].codes;
-  const activeNodes = dpad.classList.contains('cross-mode')
-    ? codes.map(code => dpadDirectionNodes[code])
-    : [joystickKnob];
-
-  setTouchState(touchId, codes, activeNodes, true);
+  setTouchState(touchId, codes, [joystickKnob], true);
 }
+
+function updateDpadKeyboard() {
+  let codes = [...dpadKeyboardKeys];
+  if (dpad.classList.contains('cross-mode')) codes = codes.slice(-1);
+  const nodes = dpad.classList.contains('cross-mode')
+    ? codes.map(code => dpadDirectionNodes[code])
+    : (codes.length ? [joystickKnob] : []);
+  setTouchState(keyboardDpadId, codes, nodes);
+}
+
+dpad.addEventListener('keydown', event => {
+  if (!dpadDirectionNodes[event.key]) return;
+  event.preventDefault();
+  event.stopPropagation();
+  dpadKeyboardKeys.add(event.key);
+  updateDpadKeyboard();
+});
+
+dpad.addEventListener('keyup', event => {
+  if (!dpadDirectionNodes[event.key]) return;
+  event.preventDefault();
+  event.stopPropagation();
+  dpadKeyboardKeys.delete(event.key);
+  updateDpadKeyboard();
+});
+
+dpad.addEventListener('blur', () => {
+  dpadKeyboardKeys.clear();
+  releaseTouch(keyboardDpadId);
+});
 
 // Suppress the browser's native long-press response on game controls.
 document.addEventListener('touchstart', event => {
@@ -864,8 +947,6 @@ dpad.addEventListener('pointerdown', event => {
 
 // Bind controls to pointer input and support non-pointer button activation.
 for (const node of document.querySelectorAll('[data-key]')) {
-  if (node.closest('#dpad')) continue;
-
   node.addEventListener('pointerdown', event => {
     if (event.button !== 0) return;
     event.preventDefault();
@@ -897,7 +978,7 @@ document.addEventListener('pointermove', event => {
     const target = document.elementFromPoint(event.clientX, event.clientY);
     const control = target instanceof Element ? target.closest('[data-key]') : null;
 
-    if (control && !control.closest('#dpad')) {
+    if (control) {
       setTouchState(event.pointerId, [control.dataset.key], [control], false);
     } else {
       setTouchState(event.pointerId, [], [], false);
@@ -910,6 +991,7 @@ document.addEventListener('pointercancel', event => releaseTouch(event.pointerId
 document.addEventListener('lostpointercapture', event => releaseTouch(event.pointerId));
 
 function releaseAllTouches() {
+  dpadKeyboardKeys.clear();
   for (const touchId of [...activeTouches.keys()]) {
     releaseTouch(touchId);
   }
@@ -945,9 +1027,13 @@ function removeGamepad(gamepad) {
 }
 
 function getGamepads() {
-  return navigator.getGamepads
-    ? navigator.getGamepads()
-    : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+  try {
+    return navigator.getGamepads
+      ? navigator.getGamepads()
+      : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+  } catch (error) {
+    return [];
+  }
 }
 
 function scanGamePads() {
@@ -982,23 +1068,24 @@ window.addEventListener('gamepaddisconnected', event => removeGamepad(event.game
 scanGamePads();
 
 function updateTouchControlsVisibility() {
-  const controls = document.querySelectorAll('#controls, #dpad, #apad, #shortcut-pad, #numpad-wrap');
-  if (hasTouchscreen && Object.keys(gamepads).length === 0) {
+  const controls = document.querySelectorAll('#dpad, #apad, #shortcut-pad, #numpad-wrap');
+  if (hasTouchscreen() && Object.keys(gamepads).length === 0) {
     for (const element of controls) element.style.display = '';
   } else {
+    releaseAllTouches();
     for (const element of controls) element.style.display = 'none';
   }
 }
 
-if (!hasTouchscreen) {
-  // Prevent scrolling when pressing specific keys on a physical keyboard.
-  window.addEventListener('keydown', event => {
-    if (preventNativeKeys.includes(event.key)) event.preventDefault();
-  });
+window.addEventListener('keydown', event => {
+  if (!hasTouchscreen() && preventNativeKeys.includes(event.key)) event.preventDefault();
+});
 
-  canvas.addEventListener('contextmenu', event => event.preventDefault());
+if (touchPointer.addEventListener) {
+  touchPointer.addEventListener('change', updateTouchControlsVisibility);
+} else if (touchPointer.addListener) {
+  touchPointer.addListener(updateTouchControlsVisibility);
 }
-
 updateTouchControlsVisibility();
 </script>
 </body>
