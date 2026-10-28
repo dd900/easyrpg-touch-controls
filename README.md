@@ -16,19 +16,33 @@ Custom mobile touch controls for the EasyRPG player, designed to make RPG Maker 
 The touch controls are intended for touch-capable browsers. When a touchscreen is detected and no gamepad is connected, the controls are shown. They are hidden in non-touch browser environments and while a gamepad is connected. The fullscreen button remains available independently.
 
 * **Joystick:** Move in a direction to send the corresponding arrow-key input. Diagonal movement sends two arrow keys.
-* **D-pad mode:** Use the D-PAD button in the utility group to switch between the joystick and four directional controls. D-pad mode sends one direction at a time.
+* **D-pad mode** (full version only): Use the D-PAD button in the utility group to switch between the joystick and four directional controls. D-pad mode sends one direction at a time.
 * **Action buttons:** Send Shift, Escape, and Enter.
 * **Shortcut buttons:** Send F1, F12, F, and G.
-* **Numpad:** Select NUM + to open the keypad, then select it again to close it.
+* **Numpad** (versions with a numpad): Select NUM + to open the keypad, then select it again to close it.
 * **Fullscreen:** Toggle fullscreen where the browser supports the Fullscreen API.
 
 Buttons support pointer input, including touch and mouse. The controls also suppress browser scrolling and long-press behavior while being used.
 The directional control can also be focused and operated with the arrow keys.
 
+## Versions
+
+The full `index.html` has a joystick with an optional D-pad mode and a numpad. If you only need part of that, pick one of the smaller versions in the `variants` folder:
+
+| File | Directional control | Numpad |
+| --- | --- | --- |
+| `index.html` | Joystick, with a toggle for four-way D-pad mode | Yes |
+| `variants/index.dpad.html` | Four-way D-pad only (no toggle) | Yes |
+| `variants/index.joystick.html` | Joystick only (no toggle) | Yes |
+| `variants/index.dpad-no-numpad.html` | Four-way D-pad only (no toggle) | No |
+| `variants/index.joystick-no-numpad.html` | Joystick only (no toggle) | No |
+
+The variants have the unused controls, styles, variables, and code removed. Without the D-pad mode toggle, the shortcut buttons form a 2x2 grid (F1, F12, F, G). All versions are generated from one source file; see [Development](#development).
+
 ## Installation
 
 1. Back up your existing `index.html`.
-2. Replace it with this repository's `index.html` in the EasyRPG Player web folder.
+2. Choose a version from the table above and copy it into the EasyRPG Player web folder. A file from the `variants` folder must be renamed to `index.html`.
 3. Open or reload the player in a touch-capable mobile browser and test the controls.
 
 The location of `index.html` depends on your EasyRPG installation. Keep the bundled player files and game data in place; this customization is for the HTML wrapper.
@@ -37,7 +51,7 @@ The location of `index.html` depends on your EasyRPG installation. Keep the bund
 
 ## Control Layout Customization
 
-Edit the CSS variables at the beginning of the `<style>` block in `index.html`. Each group can be moved and scaled independently, with separate values for portrait and landscape. The groups are:
+Edit the CSS variables at the beginning of the `<style>` block in `index.html`. The variables for controls a version does not include (for example `--numpad-*` or `--joystick-*`) only exist in the versions that have those controls. Each group can be moved and scaled independently, with separate values for portrait and landscape. The groups are:
 
 | Group | Controls |
 | --- | --- |
@@ -104,6 +118,26 @@ Designed for the EasyRPG Player in mobile browsers. Touch behavior and fullscree
 * **Controls are not visible:** Open the page on a touch-capable device or browser. A connected gamepad hides the touch controls; disconnect it to show them again.
 * **Fullscreen does not activate:** Some browsers restrict fullscreen requests. Use the browser's own fullscreen option if the button is unavailable.
 * **A layout adjustment is not taking effect:** Check that you edited the variable for the active orientation (`portrait` or `landscape`) and used a CSS length unit for `x` and `y`.
+
+## Development
+
+`index.html` and every file in `variants` are generated from `src/index.template.html` by `build.js`. Edit the template, never the generated files, then run [Node.js](https://nodejs.org) (no packages needed):
+
+```sh
+node build.js          # regenerate all versions
+node build.js --check  # fail if any generated file is out of date
+```
+
+The template is the full version with some parts wrapped in directives, each on its own line as an HTML, CSS, or JS comment: `<!-- @if numpad -->`, `/* @if numpad */`, or `// @if numpad`. `@elif`, `@else`, and `@endif` work the same way. A condition combines these flags with `!`, `&&`, and `||`:
+
+| Flag | True when the version has |
+| --- | --- |
+| `joystick` | The joystick |
+| `dpad` | The four-way D-pad |
+| `toggle` | Both, and so the D-PAD mode button |
+| `numpad` | The numpad |
+
+Placeholders such as `{{shortcutButtons}}` are replaced with a per-version value. To add a version, add a line for it to `OUTPUTS` in `build.js`.
 
 ## Disclaimer
 
